@@ -237,34 +237,38 @@ class AttendanceManagementSystem {
     }
 
 
-    private static double calculateAttendancePercentage(String studentId, String courseId, List<Course> courses, List<AttendanceRecord> attendanceRecords) {
-        Course course = findCourseById(courseId, courses);
-        if (course == null) {
-            return -1; // Student or course not found
-        }
 
-        Student student = findStudentById(studentId, course.getEnrolledStudents());
-        if (student == null) {
-            return -1; // Student or course not found
-        }
+   private static double calculateAttendancePercentage(String studentId, String courseId, List<Course> courses, List<AttendanceRecord> attendanceRecords) {
+       Course course = findCourseById(courseId, courses);
+       if (course == null) {
+           return -1; // Student or course not found
+       }
 
-        int totalClasses = 0;
-        int attendedClasses = 0;
+       Student student = findStudentById(studentId, course.getEnrolledStudents());
+       if (student == null) {
+           return -1; // Student or course not found
+       }
 
-        for (AttendanceRecord record : attendanceRecords) {
-            if (record.getDate().equals(courseId) && record.getStudentAttendance().containsKey(studentId)) {
-                totalClasses++;
-                if (record.getStudentAttendance().get(studentId)) {
-                    attendedClasses++;
-                }
-            }
-        }
-        if (totalClasses == 0) {
-            return -2; // No attendance records for this course
-        }
+       int totalClasses = 0;
+       int attendedClasses = 0;
 
-        return ((double) attendedClasses / totalClasses) * 100;
-    }
+       for (AttendanceRecord record : attendanceRecords) {
+           Boolean isPresent = record.getStudentAttendance().get(studentId);
+           if (isPresent != null) {
+               totalClasses++;
+               if (isPresent) {
+                   attendedClasses++;
+               }
+           }
+       }
+
+       if (totalClasses == 0) {
+           return -2; // No attendance records for this student
+       }
+
+       return ((double) attendedClasses / totalClasses) * 100;
+   }
+
 
     private static double calculateAverageAttendance(List<Student> students) {
         if (students.isEmpty()) {
@@ -286,5 +290,3 @@ class AttendanceManagementSystem {
         }
     }
 }
-
-     
